@@ -15,7 +15,15 @@ public class TurtleSoup {
      * @param sideLength length of each side
      */
     public static void drawSquare(Turtle turtle, int sideLength) {
-        throw new RuntimeException("implement me!");
+        if (turtle == null || sideLength <= 0) {
+            throw new IllegalArgumentException();
+        }
+        double angle = 90;
+        for (int i = 0; i < 3; ++i) {
+            turtle.forward(sideLength);
+            turtle.turn(angle);
+        }
+        turtle.forward(sideLength);
     }
 
     /**
@@ -28,7 +36,11 @@ public class TurtleSoup {
      * @return angle in degrees, where 0 <= angle < 360
      */
     public static double calculateRegularPolygonAngle(int sides) {
-        throw new RuntimeException("implement me!");
+        if (sides <= 2) {
+            throw new IllegalArgumentException();
+        }
+        double angle = (double)((sides - 2) * 180) / sides;
+        return angle;
     }
 
     /**
@@ -42,7 +54,11 @@ public class TurtleSoup {
      * @return the integer number of sides
      */
     public static int calculatePolygonSidesFromAngle(double angle) {
-        throw new RuntimeException("implement me!");
+        if (angle <= 0 || angle >= 180) {
+            throw new IllegalArgumentException();
+        }
+        int sides = (int) Math.round((2 * 180) / (180 - angle)); 
+        return sides;
     }
 
     /**
@@ -55,7 +71,15 @@ public class TurtleSoup {
      * @param sideLength length of each side
      */
     public static void drawRegularPolygon(Turtle turtle, int sides, int sideLength) {
-        throw new RuntimeException("implement me!");
+        if (turtle == null || sides < 2 || sideLength <= 0) {
+            throw new IllegalArgumentException();
+        }
+        double angle = 180 -calculateRegularPolygonAngle(sides);
+        for (int i = 0; i < sides-1; ++i) {
+            turtle.forward(sideLength);
+            turtle.turn(angle);
+        }
+        turtle.forward(sideLength);
     }
 
     /**
@@ -79,7 +103,18 @@ public class TurtleSoup {
      */
     public static double calculateHeadingToPoint(double currentHeading, int currentX, int currentY,
                                                  int targetX, int targetY) {
-        throw new RuntimeException("implement me!");
+        if (currentHeading < 0 || currentHeading >= 360) {
+            throw new IllegalArgumentException();
+        }
+        
+        double thetaInRad = Math.atan2(targetX-currentX, targetY-currentY);
+        double thetaInDeg = Math.toDegrees(thetaInRad);
+        if (currentHeading > thetaInDeg) {
+            return 360 - currentHeading - thetaInDeg;
+        } else {
+            return thetaInDeg - currentHeading;
+        }
+        
     }
 
     /**
@@ -97,7 +132,26 @@ public class TurtleSoup {
      *         otherwise of size (# of points) - 1
      */
     public static List<Double> calculateHeadings(List<Integer> xCoords, List<Integer> yCoords) {
-        throw new RuntimeException("implement me!");
+        if (xCoords == null || yCoords == null || xCoords.size() != yCoords.size()) {
+            throw new IllegalArgumentException();
+        }
+        List<Double> headings = new ArrayList<>();
+        if (xCoords.isEmpty()) {
+            return headings;
+        }
+        int currentX = xCoords.get(0);
+        int currentY = yCoords.get(0);
+        double currentHeading = 0.0;
+        
+        for (int i = 1, n = xCoords.size(); i < n; ++i) {
+            double angle = calculateHeadingToPoint(currentHeading, currentX, currentY, xCoords.get(i), yCoords.get(i));
+            headings.add(angle);
+            currentHeading = angle;
+            currentX = xCoords.get(i);
+            currentY = yCoords.get(i);
+        }
+        
+        return headings;
     }
 
     /**
@@ -109,7 +163,53 @@ public class TurtleSoup {
      * @param turtle the turtle context
      */
     public static void drawPersonalArt(Turtle turtle) {
-        throw new RuntimeException("implement me!");
+        int sideLength = 250;
+        int level = 6;
+        drawSierpenskiTriangle(turtle, sideLength, level);
+    }
+    
+    /**
+     * Draws the sierpenski triangle
+     * @param turtle the turtle context
+     * @param sideLength  the sidelength of current level
+     * @param level number of levels of recursion
+     */
+    private static void drawSierpenskiTriangle(Turtle turtle, int sideLength, int level) {
+        if (level == 0) {
+            drawTriangle(turtle, sideLength);
+        } else {
+            sideLength /= 2;
+            drawSierpenskiTriangle(turtle, sideLength, level-1);
+            turtle.color(PenColor.BLUE);
+            turtle.turn(30);                    //turn 30deg to move to point halfway of first side
+            turtle.forward(sideLength);
+            turtle.turn(330);                   //turn 330deg (330+30=360)to keep it's face vertical
+            drawSierpenskiTriangle(turtle, sideLength, level-1);
+            turtle.color(PenColor.RED);
+            turtle.turn(150);                   //turn 150deg to move to draw third triangle (30+60+60 = 150)
+            turtle.forward(sideLength);
+            turtle.turn(210);                   //turn 210deg to return to keep it's face vertical (150+210 = 360)
+            drawSierpenskiTriangle(turtle, sideLength, level-1);
+            turtle.turn(270);                   //turn 270deg to turn to move to horizontally to leftmost point (270+90 = 360)
+            turtle.forward(sideLength);
+            turtle.turn(90);                    //turn 90deg to keep it's face vertical
+            turtle.color(PenColor.BLACK);
+        }
+    }
+    
+    /**
+     * draws an equilateral triangle of given sidelength and leaves the turtle face in it's initial direction
+     * @param turtle
+     * @param sideLength
+     */
+    private static void drawTriangle(Turtle turtle, int sideLength) {
+        turtle.turn(30);            //initially turtle is in vertical position so turn 30deg
+        turtle.forward(sideLength);
+        turtle.turn(120);           //turn 120deg to make 60deg angle with initial line
+        turtle.forward(sideLength);
+        turtle.turn(120);           //same as above
+        turtle.forward(sideLength);
+        turtle.turn(90);            //turn 90deg to leave the turtle in it's initial position.
     }
 
     /**
@@ -122,9 +222,10 @@ public class TurtleSoup {
     public static void main(String args[]) {
         DrawableTurtle turtle = new DrawableTurtle();
 
-        drawSquare(turtle, 40);
-
+       // drawSquare(turtle, 40);
+        //drawRegularPolygon(turtle, 6, 60);
         // draw the window
+        drawPersonalArt(turtle);
         turtle.draw();
     }
 
