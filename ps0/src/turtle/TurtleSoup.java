@@ -163,7 +163,7 @@ public class TurtleSoup {
      * @param turtle the turtle context
      */
     public static void drawPersonalArt(Turtle turtle) {
-        int sideLength = 250;
+        int sideLength = 256;
         int level = 6;
         drawSierpenskiTriangle(turtle, sideLength, level);
     }
@@ -180,12 +180,10 @@ public class TurtleSoup {
         } else {
             sideLength /= 2;
             drawSierpenskiTriangle(turtle, sideLength, level-1);
-            turtle.color(PenColor.BLUE);
             turtle.turn(30);                    //turn 30deg to move to point halfway of first side
             turtle.forward(sideLength);
             turtle.turn(330);                   //turn 330deg (330+30=360)to keep it's face vertical
             drawSierpenskiTriangle(turtle, sideLength, level-1);
-            turtle.color(PenColor.RED);
             turtle.turn(150);                   //turn 150deg to move to draw third triangle (30+60+60 = 150)
             turtle.forward(sideLength);
             turtle.turn(210);                   //turn 210deg to return to keep it's face vertical (150+210 = 360)
@@ -193,7 +191,6 @@ public class TurtleSoup {
             turtle.turn(270);                   //turn 270deg to turn to move to horizontally to leftmost point (270+90 = 360)
             turtle.forward(sideLength);
             turtle.turn(90);                    //turn 90deg to keep it's face vertical
-            turtle.color(PenColor.BLACK);
         }
     }
     
